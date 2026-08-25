@@ -1,0 +1,11 @@
+services:
+  api-diff-proxy:
+    build: .
+    ports:
+      - "8080:8080"
+    environment:
+      PRIMARY: ${PRIMARY:-backend_a}
+      BACKEND_A_URL: ${BACKEND_A_URL}
+      BACKEND_B_URL: ${BACKEND_B_URL}
+      LOG_LEVEL: ${LOG_LEVEL:-INFO}
+      TIMEOUT_SECONDS: ${TIMEOUT_SECONDS:-30}
