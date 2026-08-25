@@ -1,0 +1,19 @@
+primary: backend_a
+
+backends:
+  backend_a:
+    url: https://middleware-v1-dev.example.com
+  backend_b:
+    url: https://middleware-v2-dev.example.com
+
+proxy:
+  timeout_seconds: 30
+
+comparison:
+  ignore_headers:
+    - date
+    - server
+    - content-length
+  ignore_json_paths:
+    - $.timestamp
+    - $.requestId
