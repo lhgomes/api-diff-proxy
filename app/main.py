@@ -11,6 +11,7 @@ from fastapi.responses import JSONResponse, Response
 
 from .comparator import compare_responses
 from .config import load_settings
+from .version import __version__
 
 settings = load_settings()
 logging.basicConfig(level=settings.log_level, format="%(message)s")
@@ -40,7 +41,7 @@ async def lifespan(app: FastAPI):
     await app.state.client.aclose()
 
 
-app = FastAPI(title="API Diff Proxy", version="0.1.0", lifespan=lifespan)
+app = FastAPI(title="API Diff Proxy", version=__version__, lifespan=lifespan)
 
 
 @app.get("/health")
@@ -68,8 +69,17 @@ def response_headers(response: httpx.Response) -> dict[str, str]:
     return {key: value for key, value in response.headers.items() if key.lower() not in excluded}
 
 
+def _request_path(request: Request) -> str:
+    # Prefer the raw ASGI path so encoded characters (e.g. %2F) reach the backend unchanged.
+    scope = getattr(request, "scope", None)
+    raw_path = scope.get("raw_path") if scope else None
+    if raw_path:
+        return raw_path.decode("latin-1")
+    return f"/{request.path_params.get('path', '')}"
+
+
 async def call_backend(client: httpx.AsyncClient, base_url: str, request: Request, body: bytes):
-    url = f"{base_url}/{request.path_params.get('path', '')}"
+    url = f"{base_url}{_request_path(request)}"
     if request.url.query:
         url = f"{url}?{request.url.query}"
     started = time.perf_counter()
