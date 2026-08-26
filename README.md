@@ -52,7 +52,9 @@ CONFIG_FILE=/app/config.yaml
 
 ### YAML configuration
 
-For comparison rules, mount a YAML file and set `CONFIG_FILE`:
+The application does not automatically load `config.yaml`. To use YAML-defined
+backends, comparison rules, or proxy settings, provide the file path through
+`CONFIG_FILE` before starting the application:
 
 ```yaml
 primary: backend_a
@@ -108,6 +110,12 @@ export BACKEND_B_URL=https://middleware-v2-dev.example.com
 uvicorn app.main:app --host 0.0.0.0 --port 8080
 ```
 
+To load the example YAML config shipped with the repository (`config.example.yaml`), start it with:
+
+```bash
+CONFIG_FILE="$PWD/config.example.yaml" uvicorn app.main:app --host 0.0.0.0 --port 8080
+```
+
 Health check:
 
 ```text
@@ -120,6 +128,8 @@ GET /health
 docker build -t api-diff-proxy .
 
 docker run --rm -p 8080:8080 \
+  -v "$PWD/config.yaml:/app/config.yaml:ro" \
+  -e CONFIG_FILE=/app/config.yaml \
   -e PRIMARY=backend_a \
   -e BACKEND_A_URL=https://middleware-v1-dev.example.com \
   -e BACKEND_B_URL=https://middleware-v2-dev.example.com \
