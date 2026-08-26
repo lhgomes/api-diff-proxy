@@ -112,7 +112,9 @@ uvicorn app.main:app --host 0.0.0.0 --port 8080
 
 To load the example YAML config shipped with the repository (`config.example.yaml`), start it with:
 
-    CONFIG_FILE="$PWD/config.example.yaml" uvicorn app.main:app --host 0.0.0.0 --port 8080
+```bash
+CONFIG_FILE="$PWD/config.example.yaml" uvicorn app.main:app --host 0.0.0.0 --port 8080
+```
 
 Health check:
 
